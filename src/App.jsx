@@ -1,9 +1,10 @@
 import React from 'react'
+import Filters from './components/Filters'
 
 export default function App() {
   return (
     <div className='app'>
-      <div>1</div>
+      <Filters />
       <div>2</div>
     </div>
   )
