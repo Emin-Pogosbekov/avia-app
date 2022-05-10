@@ -54,7 +54,7 @@ const SquareCheckBoxActive = styled(RoundCheckBoxActive)`
 const SortAreaVariantTitle = styled.span``
 
 
-
+// ------------------------------------------------------------ component ------------------------------------------------------------
 export default function Filters() {
 
   // -------------------- filters logic --------------------
@@ -114,16 +114,45 @@ export default function Filters() {
     setSort({ ...newSortObj })
   }
 
+  // -------------------- price logic --------------------
+  const [price, setPrice] = useState({
+    from: 0,
+    to: 0,
+  })
+
+  function handleInputChange(e) {
+    setPrice({[e.target.name]: e.target.value})
+  }
+
+  // -------------------- brand logic --------------------
+  const [brand, setBrand] = useState({polishAirlines: false, aeroflotAirlines: false})
+
+  const brands = [
+    { key: 0, id: 'polishAirlines', title: '- LOT Polish Airlines' },
+    { key: 1, id: 'aeroflotAirlines', title: '- Аэрофлот' },
+  ]
+
+  const brandComponents = brands.map(el => (
+    <SortAreaVariant key={el.key}>
+      <SquareCheckBox onClick={() => sortBrandsBy(el.id)}>
+        <SquareCheckBoxActive isActive={brand[el.id]} />
+      </SquareCheckBox>
+      <SortAreaVariantTitle>{el.title}</SortAreaVariantTitle>
+    </SortAreaVariant>
+  ))
+
+  function sortBrandsBy(element) {
+    const newSortObj = brand
+    for (let key in newSortObj) {
+      if (key === element) {
+        newSortObj[key] = newSortObj[key] ? false : true
+      }
+    }
+    setBrand({ ...newSortObj })
+  }
 
 
-
-
-
-
-
-
-
-
+// ------------------------------------------------------------ return ------------------------------------------------------------
   return (
     <Container>
       {/* sort by */}
@@ -140,9 +169,24 @@ export default function Filters() {
           {sortComponents}
         </SortAreaVariants>
       </SortArea>
+      {/* Price inputs */}
       <SortArea>
         <SortAreaTitle>Цена</SortAreaTitle>
-        
+        <SortAreaVariant>          
+            <span>От</span>
+            <input type='text' name='from' placeholder='0' onChange={handleInputChange} />
+        </SortAreaVariant>
+        <SortAreaVariant>          
+            <span>До</span>
+            <input type='text' name='to' placeholder='100 000' onChange={handleInputChange}  />
+        </SortAreaVariant>
+      </SortArea>
+      {/* filter brands */}
+      <SortArea>
+        <SortAreaTitle>Авиакомпании</SortAreaTitle>
+        <SortAreaVariants>
+          {brandComponents}
+        </SortAreaVariants>
       </SortArea>
     </Container>
   )
