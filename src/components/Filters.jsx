@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import { useSelector, useDispatch } from 'react-redux'
+import { choose, sortBy, handleInput, sortBrandsBy } from '../features/filterSlice'
 
 const Container = styled.div`
   display: flex;
@@ -58,7 +60,8 @@ const SortAreaVariantTitle = styled.span``
 export default function Filters() {
 
   // -------------------- filters logic --------------------
-  const [choosenFilter, setChoosenFilter] = useState({ asc: true, desc: false, price: false })
+  const choosenFilter = useSelector(state => state.filterReducer.choosenFilter)
+  const dispatch = useDispatch()
 
   const filters = [
     { key: 0, id: 'asc', title: '- по возрастанию цены' },
@@ -68,28 +71,15 @@ export default function Filters() {
 
   const filtersComponents = filters.map(el => (
     <SortAreaVariant key={el.key}>
-      <RoundCheckBox onClick={() => choose(el.id)}>
+      <RoundCheckBox onClick={() => dispatch(choose(el.id))}>
         <RoundCheckBoxActive isActive={choosenFilter[el.id]} />
       </RoundCheckBox>
       <SortAreaVariantTitle>{el.title}</SortAreaVariantTitle>
     </SortAreaVariant>
   ))
 
-  function choose(element) {
-    const newChoosenFilter = choosenFilter
-    for (let key in newChoosenFilter) {
-      if (key === element) {
-        newChoosenFilter[key] = true
-      } else {
-        newChoosenFilter[key] = false
-      }
-    }
-    setChoosenFilter({ ...newChoosenFilter })
-  }
-
   // -------------------- sort logic --------------------
-  const [sort, setSort] = useState({ singleTransfer: false, noTransfer: false })
-
+  const sort = useSelector(state => state.filterReducer.sort)
   const sorts = [
     { key: 0, id: 'singleTransfer', title: '- 1 пересадка' },
     { key: 1, id: 'noTransfer', title: '- без пересадок' },
@@ -97,22 +87,12 @@ export default function Filters() {
 
   const sortComponents = sorts.map(el => (
     <SortAreaVariant key={el.key}>
-      <SquareCheckBox onClick={() => sortBy(el.id)}>
+      <SquareCheckBox onClick={() => dispatch(sortBy(el.id))}>
         <SquareCheckBoxActive isActive={sort[el.id]} />
       </SquareCheckBox>
       <SortAreaVariantTitle>{el.title}</SortAreaVariantTitle>
     </SortAreaVariant>
   ))
-
-  function sortBy(element) {
-    const newSortObj = sort
-    for (let key in newSortObj) {
-      if (key === element) {
-        newSortObj[key] = newSortObj[key] ? false : true
-      }
-    }
-    setSort({ ...newSortObj })
-  }
 
   // -------------------- price logic --------------------
   const [price, setPrice] = useState({
@@ -121,12 +101,11 @@ export default function Filters() {
   })
 
   function handleInputChange(e) {
-    setPrice({[e.target.name]: e.target.value})
+    setPrice({ [e.target.name]: e.target.value })
   }
 
   // -------------------- brand logic --------------------
-  const [brand, setBrand] = useState({polishAirlines: false, aeroflotAirlines: false})
-
+  const brand = useSelector(state => state.filterReducer.brand)
   const brands = [
     { key: 0, id: 'polishAirlines', title: '- LOT Polish Airlines' },
     { key: 1, id: 'aeroflotAirlines', title: '- Аэрофлот' },
@@ -134,25 +113,14 @@ export default function Filters() {
 
   const brandComponents = brands.map(el => (
     <SortAreaVariant key={el.key}>
-      <SquareCheckBox onClick={() => sortBrandsBy(el.id)}>
+      <SquareCheckBox onClick={() => dispatch(sortBrandsBy(el.id))}>
         <SquareCheckBoxActive isActive={brand[el.id]} />
       </SquareCheckBox>
       <SortAreaVariantTitle>{el.title}</SortAreaVariantTitle>
     </SortAreaVariant>
   ))
 
-  function sortBrandsBy(element) {
-    const newSortObj = brand
-    for (let key in newSortObj) {
-      if (key === element) {
-        newSortObj[key] = newSortObj[key] ? false : true
-      }
-    }
-    setBrand({ ...newSortObj })
-  }
-
-
-// ------------------------------------------------------------ return ------------------------------------------------------------
+  // ------------------------------------------------------------ return ------------------------------------------------------------
   return (
     <Container>
       {/* sort by */}
@@ -172,13 +140,13 @@ export default function Filters() {
       {/* Price inputs */}
       <SortArea>
         <SortAreaTitle>Цена</SortAreaTitle>
-        <SortAreaVariant>          
-            <span>От</span>
-            <input type='text' name='from' placeholder='0' onChange={handleInputChange} />
+        <SortAreaVariant>
+          <span>От</span>
+          <input type='text' name='from' placeholder='0' onChange={(e) => dispatch(handleInput({name: e.target.name, value: e.target.value}))} />
         </SortAreaVariant>
-        <SortAreaVariant>          
-            <span>До</span>
-            <input type='text' name='to' placeholder='100 000' onChange={handleInputChange}  />
+        <SortAreaVariant>
+          <span>До</span>
+          <input type='text' name='to' placeholder='100 000' onChange={(e) => dispatch(handleInput({name: e.target.name, value: e.target.value}))} />
         </SortAreaVariant>
       </SortArea>
       {/* filter brands */}
